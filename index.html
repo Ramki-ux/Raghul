@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RevOps Strategy — Voltflo</title>
+<meta name="description" content="Practical RevOps Improvement Opportunities for Voltflo — A focused strategy to strengthen Voltflo's revenue engine.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0A0F1E;--blue:#3B82F6;--green:#10B981;--red:#EF4444;--success:#22C55E;
+--white:#FFF;--grey:#94A3B8;--card:#111827;--border:#1E293B;
+--grad-start:#1E3A5F;--grad-end:#0A0F1E;--radius:12px;--pad:24px;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);line-height:1.6;overflow:hidden;height:100vh}
+h1,h2,h3{font-weight:700;line-height:1.2}
+/* NAV — desktop sidebar */
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:rgba(10,15,30,.95);border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;padding:24px 16px;z-index:200;backdrop-filter:blur(12px)}
+.sidebar a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--grey);text-decoration:none;font-size:13px;border-radius:8px;transition:all .25s;cursor:pointer}
+.sidebar a:hover,.sidebar a.active{color:var(--white);background:rgba(59,130,246,.12)}
+.sidebar a.active{border-left:3px solid var(--blue)}
+.sidebar .nav-num{font-weight:700;font-size:11px;color:var(--blue);min-width:18px}
+/* NAV — mobile progress bar */
+.mobile-nav{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,15,30,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 16px}
+.progress-track{display:flex;gap:4px;align-items:center}
+.progress-dot{flex:1;height:4px;background:var(--border);border-radius:4px;transition:background .3s;cursor:pointer}
+.progress-dot.active{background:var(--blue)}
+.mobile-label{font-size:11px;color:var(--grey);margin-top:4px;text-align:center}
+/* Main — slide container */
+.main{margin-left:220px;position:relative;height:100vh;overflow:hidden}
+/* Slide base — horizontal transitions */
+.slide{position:absolute;top:0;left:0;width:100%;height:100vh;padding:60px 64px;display:flex;flex-direction:column;justify-content:flex-start;overflow-y:auto;overflow-x:hidden;transform:translateX(100%);opacity:0;transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .55s ease;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.slide::-webkit-scrollbar{width:6px}
+.slide::-webkit-scrollbar-track{background:transparent}
+.slide::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.slide.active{transform:translateX(0);opacity:1;z-index:2}
+.slide.prev{transform:translateX(-100%);opacity:0;z-index:1}
+.slide-inner{max-width:960px;width:100%;margin:0 auto;padding-bottom:100px;min-width:0;overflow-x:hidden;overflow-wrap:break-word}
+/* Centered slides (short content) */
+.slide.centered{display:flex;align-items:center;justify-content:center}
+.slide.centered .slide-inner{padding-bottom:40px}
+/* Fade-in for active slide content */
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease .15s,transform .6s ease .15s}
+.slide.active .fade-in{opacity:1;transform:translateY(0)}
+/* Staggered child animation */
+@keyframes staggerIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.stagger-child{opacity:0}
+.slide.active .stagger-child{animation:staggerIn .5s ease forwards}
+/* Slide controls */
+.slide-controls{position:fixed;bottom:0;left:220px;right:0;z-index:150;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:linear-gradient(transparent,rgba(10,15,30,.97) 40%);pointer-events:none}
+.slide-controls *{pointer-events:auto}
+.slide-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--white);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;user-select:none}
+.slide-btn:hover{background:rgba(59,130,246,.15);border-color:var(--blue)}
+.slide-btn:disabled{opacity:.3;cursor:default;background:var(--card);border-color:var(--border)}
+.slide-btn .arrow{font-size:18px;color:var(--blue)}
+.slide-counter{font-size:13px;color:var(--grey);font-weight:500}
+.slide-counter span{color:var(--white);font-weight:700;font-size:16px}
+/* Labels */
+.section-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:12px}
+.section-label.green{color:var(--green)}
+.slide-heading{font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:24px}
+.body-text{color:var(--grey);font-size:16px;line-height:1.75;margin-bottom:16px}
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad);position:relative}
+.card.blue-top{border-top:3px solid var(--blue)}
+.card.green-top{border-top:3px solid var(--green)}
+/* Metric cards */
+.metric-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--blue);border-radius:var(--radius);padding:20px 28px;text-align:center;min-width:180px}
+.metric-card .num{font-size:32px;font-weight:800;color:var(--white)}
+.metric-card .label{font-size:13px;color:var(--grey);margin-top:4px}
+/* Divider */
+.divider{height:1px;background:var(--blue);opacity:.4;margin:28px auto;max-width:400px}
+/* Callout */
+.callout{border-left:3px solid var(--blue);background:var(--card);border-radius:0 var(--radius) var(--radius) 0;padding:20px 24px;margin-top:24px}
+.callout p{color:var(--grey);font-style:italic;font-size:15px;line-height:1.75}
+/* Two-col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}
+/* Area cards (expandable) */
+.area-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0;margin-bottom:20px;overflow:hidden}
+.area-header{display:flex;align-items:center;gap:16px;padding:20px 24px;cursor:pointer;transition:background .2s}
+.area-header:hover{background:rgba(59,130,246,.05)}
+.area-num{width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.15);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.area-title{font-size:16px;font-weight:600;color:var(--white);flex:1}
+.area-toggle{color:var(--grey);font-size:20px;transition:transform .3s}
+.area-toggle.open{transform:rotate(180deg)}
+.area-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.area-body.open{max-height:1200px}
+.area-body-inner{padding:0 24px 24px}
+.area-row{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.area-dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.area-dot.red{background:var(--red)}.area-dot.blue{background:var(--blue)}.area-dot.green{background:var(--success)}
+.area-row-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.area-row-label.red{color:var(--red)}.area-row-label.blue{color:var(--blue)}.area-row-label.green{color:var(--success)}
+.area-row-text{font-size:14px;line-height:1.7;color:var(--grey)}
+.area-row-text.red-t{color:rgba(239,68,68,.8)}.area-row-text.green-t{color:rgba(34,197,94,.85)}
+/* Tool tags */
+.tool-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tool-tag{background:rgba(148,163,184,.1);color:var(--grey);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+/* Workflow strip */
+.workflow-strip{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:32px 0;justify-content:center}
+.wf-step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:500;color:var(--white);white-space:nowrap}
+.wf-arrow{color:var(--blue);font-size:18px;margin:0 6px;font-weight:700}
+/* Contribution grid */
+.contrib-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+.contrib-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.contrib-icon{font-size:24px;margin-bottom:10px}
+.contrib-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:6px}
+.contrib-desc{font-size:13px;color:var(--grey);line-height:1.6}
+/* Pilot cards */
+.pilot-card{display:flex;gap:24px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:20px}
+.pilot-num{font-size:48px;font-weight:800;color:rgba(148,163,184,.2);line-height:1;min-width:60px}
+.pilot-title{font-size:17px;font-weight:600;color:var(--white);margin-bottom:8px}
+.pilot-desc{font-size:14px;color:var(--grey);line-height:1.7}
+/* Closing — enhanced with glow */
+.closing-card{background:linear-gradient(135deg,var(--grad-start),var(--grad-end));border-radius:var(--radius);padding:40px;margin-top:32px;border:1px solid rgba(59,130,246,.25);box-shadow:0 0 30px rgba(59,130,246,.08),0 0 60px rgba(59,130,246,.04)}
+.closing-card p{margin-bottom:16px;line-height:1.75}
+.closing-card .wht{color:var(--white);font-size:20px;font-weight:500}
+.closing-card .gry{color:var(--grey);font-size:15px}
+.closing-card .sig{color:var(--grey);font-size:13px;margin-top:20px}
+/* Flywheel callout */
+.flywheel-callout{border-left:4px solid var(--blue);background:rgba(59,130,246,.06);border-radius:0 var(--radius) var(--radius) 0;padding:24px 28px;margin-top:28px}
+.flywheel-callout p{color:var(--white);font-size:18px;font-weight:500;line-height:1.7;margin:0}
+/* Next-slide indicator */
+.scroll-ind{text-align:center;margin-top:40px;cursor:pointer}
+.scroll-ind span{display:inline-block;color:var(--grey);font-size:24px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+/* Blue glow */
+.glow{position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,.12) 0%,transparent 70%);border-radius:50%;animation:pulse 4s ease-in-out infinite;pointer-events:none}
+@keyframes pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+/* Cover center */
+.cover-center{text-align:center;position:relative;z-index:1}
+.cover-title{font-size:clamp(30px,5vw,48px);font-weight:800;margin-bottom:16px}
+.cover-sub{color:var(--blue);font-size:clamp(14px,2vw,18px);margin-bottom:12px;font-weight:500}
+.cover-meta{color:var(--grey);font-size:14px}
+/* RESPONSIVE */
+@media(max-width:900px){
+.sidebar{display:none}
+.mobile-nav{display:block}
+.main{margin-left:0}
+.slide{padding:80px 24px 80px}
+.slide.centered{justify-content:flex-start;align-items:center}
+.slide.centered .slide-inner{padding-top:20px}
+.slide-controls{left:0;padding:12px 16px}
+.two-col,.contrib-grid{grid-template-columns:1fr}
+.metric-row{flex-direction:column;align-items:center}
+.metric-card{width:100%;max-width:280px}
+.pilot-card{flex-direction:column;gap:12px}
+.pilot-num{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR NAV (desktop) -->
+<nav class="sidebar" id="sidebar">
+<a onclick="goTo(0)" class="active"><span class="nav-num">01</span>Cover</a>
+<a onclick="goTo(1)"><span class="nav-num">02</span>Understanding</a>
+<a onclick="goTo(2)"><span class="nav-num">03</span>Two Sides</a>
+<a onclick="goTo(3)"><span class="nav-num">04</span>Side A — Internal</a>
+<a onclick="goTo(4)"><span class="nav-num">05</span>Side B — Product</a>
+<a onclick="goTo(5)"><span class="nav-num">06</span>Contribution</a>
+<a onclick="goTo(6)"><span class="nav-num">07</span>Pilots &amp; Close</a>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+<div class="progress-track" id="progressTrack"></div>
+<div class="mobile-label" id="mobileLabel">Cover</div>
+</div>
+
+<main class="main">
+
+<!-- SLIDE 1: COVER -->
+<section class="slide active centered" id="slide1">
+<div class="glow"></div>
+<div class="slide-inner cover-center fade-in">
+<h1 class="cover-title">The Revenue Engine Voltflo Needs Right Now</h1>
+<p class="cover-sub">A focused strategy to strengthen Voltflo's revenue engine — internally and through the product</p>
+<p class="cover-meta">Prepared by Raghul Senthilvel · Dublin, Ireland · Revenue Operations + AI Automation · Irish Solar Market</p>
+<div class="divider"></div>
+<div class="metric-row">
+<div class="metric-card"><div class="num">2</div><div class="label">Revenue Sides Covered</div></div>
+<div class="metric-card"><div class="num">5</div><div class="label">Core AI Workflows</div></div>
+<div class="metric-card"><div class="num">3</div><div class="label">Pilot-Ready Builds</div></div>
+</div>
+<div class="scroll-ind" onclick="goTo(1)"><span>&#8595;</span></div>
+</div>
+</section>
+
+<!-- SLIDE 2: UNDERSTANDING -->
+<section class="slide centered" id="slide2">
+<div class="slide-inner fade-in">
+<p class="section-label">Understanding the business</p>
+<h2 class="slide-heading">My read on Voltflo</h2>
+<p class="body-text">From what I can see, Voltflo isn't just another CRM for solar companies. You're building a commercial engine that helps solar installers in Ireland handle leads better, close faster, and spend less time buried in admin. That's a real problem worth solving — and the Irish solar market right now, with SEAI grants pushing residential demand, is exactly the right time to own that space.</p>
+<p class="body-text">But the biggest opportunity I see for Voltflo right now isn't about adding more features. It's about tightening the revenue system on two fronts simultaneously — how Voltflo itself sells and grows, and how Voltflo's product helps solar installers stop leaking money in their own pipelines.</p>
+<p class="body-text">The real leverage for Voltflo isn't more features. It's tighter execution across the revenue stages that already exist — and that's exactly where I'd focus.</p>
+<div class="callout"><p>The Irish solar market is moving fast. The companies that win won't just have the best software — they'll be the ones whose customers close more deals and waste less time on admin.</p></div>
+</div>
+</section>
+
+<!-- SLIDE 3: TWO-SIDED OPPORTUNITY -->
+<section class="slide centered" id="slide3">
+<div class="slide-inner fade-in">
+<p class="section-label">The two-sided opportunity</p>
+<h2 class="slide-heading">Where RevOps compounds for Voltflo</h2>
+<p class="body-text">When David asked about RevOps, I think he's really asking two things at once — and both matter equally.</p>
+<div class="two-col">
+<div class="card blue-top">
+<h3 style="font-size:17px;margin-bottom:12px">Side A — Internal RevOps (For Voltflo)</h3>
+<p class="body-text" style="margin:0">How do we help David sell Voltflo to more solar companies in Ireland, faster, without needing to hire 10 more salespeople? This is about Voltflo's own pipeline — lead sources, outreach, conversion, and retention.</p>
+</div>
+<div class="card green-top">
+<h3 style="font-size:17px;margin-bottom:12px">Side B — Product RevOps (For Solar Installers)</h3>
+<p class="body-text" style="margin:0">How do we make Voltflo's product so powerful that solar installers can't imagine running their business without it? This is about what Voltflo builds — features that directly solve revenue leaks for installers on the ground.</p>
+</div>
+</div>
+<p class="body-text" style="margin-top:24px">The companies that win in B2B software are the ones that align both sides.</p>
+<div class="flywheel-callout"><p>If Voltflo grows its own pipeline efficiently AND delivers measurable revenue improvements to its customers, it creates a flywheel — more installs, more testimonials, lower churn, higher LTV. That's the goal.</p></div>
+</div>
+</section>
+
+<!-- SLIDE 4: SIDE A -->
+<section class="slide" id="slide4">
+<div class="slide-inner fade-in">
+<p class="section-label">Side A — Internal</p>
+<h2 class="slide-heading">Voltflo's own revenue engine</h2>
+<p class="body-text">As Voltflo moves from early traction to scale, the revenue engine needs to move beyond what any founding team can manage manually. Here are the three areas I'd address first:</p>
+
+<!-- Area 1 -->
+<div class="area-card">
+<div class="area-header" onclick="toggleArea(this)">
+<div class="area-num">1</div>
+<div class="area-title">Centralised lead intelligence — know exactly where every lead comes from</div>
+<div class="area-toggle">&#9660;</div>
+</div>
+<div class="area-body">
+<div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">Leads coming in from LinkedIn, email outreach, referrals, events, and the website are all sitting in different places. There's no single view of which sources actually convert to paid customers.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">A centralised database that pulls all lead sources into one place — every WhatsApp enquiry, every inbound call, every form submission, every referral — using Make or n8n as the integration layer with Airtable or a lightweight database at the centre. On top of that, an AI layer using Claude or GPT that lets the team ask plain-English questions like 'which lead source had the highest conversion last month' or 'how many leads came in from LinkedIn vs referrals this quarter' and get instant answers without building a dashboard nobody checks.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">The founding team can see exactly where to double down on outreach and where to cut wasted effort. Decisions based on real data, not gut feel.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">Make / n8n</span><span class="tool-tag">Airtable</span><span class="tool-tag">Claude API</span></div>
+</div></div></div>
+
+<!-- Area 2 -->
+<div class="area-card">
+<div class="area-header" onclick="toggleArea(this)">
+<div class="area-num">2</div>
+<div class="area-title">AI prospecting agent — find the right solar firms before they find you</div>
+<div class="area-toggle">&#9660;</div>
+</div>
+<div class="area-body">
+<div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">High-value solar installers in Ireland are busy. Cold outreach that sounds generic gets ignored. Manually identifying which firms are growing and worth approaching takes hours.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">An automated prospecting workflow using n8n and Python that monitors public sources — SEAI registered installer lists, Irish planning permissions, Companies Registration Office filings — to identify solar firms showing growth signals. It then triggers a personalised outreach sequence from the founding team's inbox that mentions something specific to that company, making it feel like research, not spam.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">The founding team receives a curated list of 10 to 15 warm prospects every Monday morning with a draft outreach email ready to send for each one. One click to approve, one click to send.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Python</span><span class="tool-tag">SEAI data</span></div>
+</div></div></div>
+
+<!-- Area 3 -->
+<div class="area-card">
+<div class="area-header" onclick="toggleArea(this)">
+<div class="area-num">3</div>
+<div class="area-title">Pipeline discipline and stale deal detection</div>
+<div class="area-toggle">&#9660;</div>
+</div>
+<div class="area-body">
+<div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">Revenue systems break when the pipeline can't be trusted. Deals sit in 'Proposal Sent' for three weeks with no follow-up, and nobody notices until the prospect signs with a competitor.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">Automated stale deal detection that flags any deal that hasn't moved in 72 hours and prompts the right action — a follow-up email draft, a call reminder, or an internal Slack alert. Stage-entry and stage-exit criteria enforced in the CRM so the pipeline always reflects reality. A simple Monday morning summary delivered by WhatsApp or email: 'Last week — 12 leads, 7 demos booked, 3 proposals out, 2 stuck. Here's what needs attention.'</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Voltflo's own win rate improves because nothing falls through the cracks. The team spends time selling, not chasing spreadsheets.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">Make</span><span class="tool-tag">WhatsApp API</span><span class="tool-tag">CRM automation</span></div>
+</div></div></div>
+
+<div class="workflow-strip">
+<div class="wf-step">All lead sources</div><div class="wf-arrow">→</div>
+<div class="wf-step">n8n / Make</div><div class="wf-arrow">→</div>
+<div class="wf-step">Central DB</div><div class="wf-arrow">→</div>
+<div class="wf-step">AI query layer</div><div class="wf-arrow">→</div>
+<div class="wf-step">Instant answers</div>
+</div>
+</div>
+</section>
+
+<!-- SLIDE 5: SIDE B — PRODUCT -->
+<section class="slide" id="slide5">
+<div class="slide-inner fade-in">
+<p class="section-label green">Side B — Product</p>
+<h2 class="slide-heading">Where Voltflo's product creates value that installers can't walk away from</h2>
+<p class="body-text">The solar installer market in Ireland is growing fast, but the operational reality on the ground is still messy. Installers are managing leads on WhatsApp, sending quotes by email, chasing SEAI paperwork manually, and losing track of jobs mid-installation. Voltflo can own this problem entirely — but only if the product goes deeper than a nice interface.</p>
+<p class="body-text">Here are the specific areas where Voltflo's product can create the kind of value that makes installers never want to leave:</p>
+
+<div class="area-card"><div class="area-header" onclick="toggleArea(this)"><div class="area-num">1</div><div class="area-title">Lead qualification before a human ever picks up the phone</div><div class="area-toggle">&#9660;</div></div>
+<div class="area-body"><div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">Solar installers waste enormous time calling people who are just browsing or who have a completely unsuitable property — north-facing roof, heavily shaded, rented property. Every bad call costs 20 minutes and a lot of frustration.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">An AI-assisted qualification layer that scores every incoming lead automatically based on what the homeowner tells you — Eircode, property ownership, roof orientation, monthly electricity bill, timeline, budget range. The system tags the lead as hot, warm, or not suitable before anyone touches it. A brief 'lead prep summary' is generated for the sales rep so when they do call, they already know the context.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Installers call fewer leads but close a higher percentage of them. Sales rep time is spent on the right people. Rejection rate drops.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">AI scoring logic</span><span class="tool-tag">Eircode enrichment</span><span class="tool-tag">n8n</span></div>
+</div></div></div>
+
+<div class="area-card"><div class="area-header" onclick="toggleArea(this)"><div class="area-num">2</div><div class="area-title">AI sales agent — answering calls and handling missed calls automatically</div><div class="area-toggle">&#9660;</div></div>
+<div class="area-body"><div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">A homeowner calls at 7pm on a Friday. Nobody answers. They call another installer on Saturday morning and book with them. That lead is gone. This happens constantly.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">A voice AI agent built using ElevenLabs with a natural Irish accent that handles inbound calls when the team is unavailable. It answers basic qualification questions, books survey appointments directly into the installer's calendar, and handles common objections around SEAI grants, payback periods, and battery compatibility. For missed calls, the agent automatically calls back within two minutes, explains who it is, and offers to book a callback with the human team. The agent knows what to say and — critically — what not to say. It never gives definitive grant amounts or technical guarantees. It keeps it warm, human, and helpful.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Zero missed lead opportunities. Installers stop losing Friday evening and weekend enquiries to competitors. Booking rates improve significantly.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">ElevenLabs</span><span class="tool-tag">Voice AI</span><span class="tool-tag">Calendar integration</span></div>
+</div></div></div>
+
+<div class="area-card"><div class="area-header" onclick="toggleArea(this)"><div class="area-num">3</div><div class="area-title">Proposal follow-up that runs itself</div><div class="area-toggle">&#9660;</div></div>
+<div class="area-body"><div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">A beautiful proposal goes out on a Tuesday. The homeowner says they'll think about it. The installer forgets to follow up. Three weeks later the deal is dead and nobody knows why.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">An automated follow-up sequence that triggers the moment a proposal is sent. If there's no response after 48 hours, a plain-English follow-up goes out. At 5 days, a second message that mentions installation dates filling up. At 10 days, the rep gets a prompt with likely friction points based on the lead's profile — 'This homeowner mentioned they were waiting on a BER cert. Worth checking in on that specifically.' If a proposal has been open but not signed, the system flags it as a warm re-engagement opportunity.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Installers stop losing quotes to silence. More proposals convert. Sales cycles shorten. The rep always knows what to say next.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">Make</span><span class="tool-tag">Email / SMS automation</span><span class="tool-tag">Claude API</span></div>
+</div></div></div>
+
+<div class="area-card"><div class="area-header" onclick="toggleArea(this)"><div class="area-num">4</div><div class="area-title">Clean handoff from signed contract to installation — no information lost</div><div class="area-toggle">&#9660;</div></div>
+<div class="area-body"><div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">The deal is signed. Everyone's happy. Then operations can't find the site survey photos. The SEAI grant submission is missing a utility bill. The install gets delayed. The homeowner starts to worry. The goodwill from the sale evaporates.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">A standardised handoff checklist that is automatically created when a deal moves to closed-won. It pulls together everything operations needs — survey photos, roof dimensions, access notes, ID documents, utility bill, BER cert status — and flags exactly what's missing before the job is scheduled. Milestone-based customer updates go out automatically at each stage: grant submitted, grant approved, install date confirmed, install complete, commissioning booked. An AI summary of the deal context is generated for the operations team so they know exactly what was promised to the customer during the sale.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Jobs start on time. SEAI submissions go in clean the first time. Customers feel looked after. Referrals increase. Rework and chasing drops significantly.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">Airtable</span><span class="tool-tag">n8n</span><span class="tool-tag">WhatsApp API</span><span class="tool-tag">Claude API</span></div>
+</div></div></div>
+
+<div class="area-card"><div class="area-header" onclick="toggleArea(this)"><div class="area-num">5</div><div class="area-title">Revenue visibility — answers in seconds, not reports nobody reads</div><div class="area-toggle">&#9660;</div></div>
+<div class="area-body"><div class="area-body-inner">
+<div class="area-row"><div class="area-dot red"></div><div><div class="area-row-label red">The problem</div><div class="area-row-text red-t">Business owners don't have time to build reports or read dashboards. They want to know three things fast — where are my leads coming from, where are deals getting stuck, and how much revenue is actually in the pipeline right now.</div></div></div>
+<div class="area-row"><div class="area-dot blue"></div><div><div class="area-row-label blue">What I'd build</div><div class="area-row-text">A centralised intelligence database that consolidates all lead sources, pipeline stages, job statuses, and revenue data. On top of it, a conversational AI layer that lets the business owner ask questions in plain English: 'What's my total revenue from closed jobs this month?' or 'Which lead source had the best conversion rate last quarter?' or 'How many proposals are currently sitting unsigned?' — and get a straight answer in seconds. No dashboards to interpret. No spreadsheets to update. Just questions and answers.</div></div></div>
+<div class="area-row"><div class="area-dot green"></div><div><div class="area-row-label green">Outcome</div><div class="area-row-text green-t">Installers running 20-plus jobs a month finally have real visibility. Business decisions get made on actual data. The product becomes something they genuinely rely on daily.</div></div></div>
+<div class="tool-tags"><span class="tool-tag">Airtable / PostgreSQL</span><span class="tool-tag">Claude API</span><span class="tool-tag">Make</span><span class="tool-tag">Antigravity</span></div>
+</div></div></div>
+
+<div class="workflow-strip">
+<div class="wf-step">Enquiry arrives</div><div class="wf-arrow">→</div>
+<div class="wf-step">AI qualifies</div><div class="wf-arrow">→</div>
+<div class="wf-step">Survey booked</div><div class="wf-arrow">→</div>
+<div class="wf-step">Proposal sent</div><div class="wf-arrow">→</div>
+<div class="wf-step">Auto follow-up</div><div class="wf-arrow">→</div>
+<div class="wf-step">Deal closed</div><div class="wf-arrow">→</div>
+<div class="wf-step">Handoff pack</div><div class="wf-arrow">→</div>
+<div class="wf-step">Install tracked</div><div class="wf-arrow">→</div>
+<div class="wf-step">SEAI submitted</div><div class="wf-arrow">→</div>
+<div class="wf-step">Referral triggered</div>
+</div>
+</div>
+</section>
+
+<!-- SLIDE 6: CONTRIBUTION -->
+<section class="slide centered" id="slide6">
+<div class="slide-inner fade-in">
+<p class="section-label">What I'd contribute</p>
+<h2 class="slide-heading">How I'd actually work on this</h2>
+<p class="body-text">I'm not pitching myself as someone who just knows about automation. I've built these kinds of systems before — specifically for SMEs dealing with high lead volume, manual admin overload, and sales pipelines that weren't being managed properly. I've used Airtable, Make, n8n, Claude, and ElevenLabs in real builds, and I understand where these tools add genuine value and where they just add noise.</p>
+<p class="body-text">What I bring to Voltflo specifically is the combination of understanding the Irish solar market — SEAI grant processes, ESB Networks grid connection timelines, the kind of objections homeowners raise — and the technical ability to actually build the automation layer around it, not just describe it in a slide deck.</p>
+<p class="body-text" style="margin-bottom:4px">What I'd work on directly:</p>
+<p class="body-text" style="margin-bottom:4px;padding-left:8px">— Workflow mapping to find where the pipeline is actually leaking</p>
+<p class="body-text" style="margin-bottom:4px;padding-left:8px">— Process design to structure how data moves between stages</p>
+<p class="body-text" style="margin-bottom:4px;padding-left:8px">— Automation builds using Make and n8n to connect the systems</p>
+<p class="body-text" style="margin-bottom:4px;padding-left:8px">— Internal tooling so the team gets the right alerts at the right time</p>
+<p class="body-text" style="margin-bottom:4px;padding-left:8px">— Reporting structure so there's a simple weekly output that tells the business exactly what needs attention</p>
+<div class="contrib-grid">
+<div class="contrib-card"><div class="contrib-icon">🔍</div><div class="contrib-title">Workflow mapping</div><div class="contrib-desc">Find where the pipeline is actually leaking time or money</div></div>
+<div class="contrib-card"><div class="contrib-icon">🏗️</div><div class="contrib-title">Process design</div><div class="contrib-desc">Structure how data moves between every stage cleanly</div></div>
+<div class="contrib-card"><div class="contrib-icon">⚡</div><div class="contrib-title">Automation builds</div><div class="contrib-desc">Make and n8n workflows connecting all the systems</div></div>
+<div class="contrib-card"><div class="contrib-icon">🔔</div><div class="contrib-title">Internal tooling</div><div class="contrib-desc">Automated alerts for stalled deals and missing handoff data</div></div>
+<div class="contrib-card"><div class="contrib-icon">📊</div><div class="contrib-title">Reporting structure</div><div class="contrib-desc">Simple weekly outputs showing what needs attention</div></div>
+<div class="contrib-card"><div class="contrib-icon">🤖</div><div class="contrib-title">AI implementation</div><div class="contrib-desc">Selective AI applied only where it genuinely improves execution</div></div>
+</div>
+</div>
+</section>
+
+<!-- SLIDE 7: PILOT & CLOSING -->
+<section class="slide" id="slide7">
+<div class="slide-inner fade-in">
+<p class="section-label">Where to start</p>
+<h2 class="slide-heading">Three pilot areas — low risk, fast proof</h2>
+<p class="body-text">I know you're moving fast and a big transformation project is the last thing a lean team needs. My suggestion is to start with one tightly defined 14-day pilot that proves the value quickly, then build from there.</p>
+
+<div class="pilot-card"><div class="pilot-num">01</div><div><div class="pilot-title">Lead intake and qualification workflow</div><div class="pilot-desc">Build the scoring and routing logic so every new lead is automatically graded and prepared before anyone picks up the phone. Immediate impact on sales rep efficiency and call quality.</div></div></div>
+<div class="pilot-card"><div class="pilot-num">02</div><div><div class="pilot-title">Proposal follow-up orchestration</div><div class="pilot-desc">Set up the automated follow-up sequence for proposals sitting idle over 48 hours. This one directly recovers deals that would otherwise go cold with no follow-through.</div></div></div>
+<div class="pilot-card"><div class="pilot-num">03</div><div><div class="pilot-title">Centralised lead database with AI query layer</div><div class="pilot-desc">Connect all lead sources into one place and put the conversational AI layer on top. This gives both Voltflo internally and its customers the revenue visibility they currently don't have.</div></div></div>
+
+<div class="closing-card">
+<p class="wht">The solar market in Ireland is moving fast and Voltflo is positioned right at the centre of it. The companies that win in this space won't just be the ones with the best software — they'll be the ones whose customers close more deals, waste less time on admin, and can actually see what's working in their business.</p>
+<p class="gry">If one of these three pilot areas looks like the right place to start, I can put together a simple one-week plan showing exactly how we'd run it. Happy to jump on a call whenever works.</p>
+<p class="gry">Thanks for taking the time to read this.</p>
+<p class="sig">Raghul Senthilvel · Dublin, Ireland · +353 894 228 274 · raghul.s3121@gmail.com</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- SLIDE CONTROLS -->
+<div class="slide-controls">
+<button class="slide-btn" id="prevBtn" disabled onclick="prevSlide()"><span class="arrow">←</span> Previous</button>
+<div class="slide-counter"><span id="curNum">1</span> / <span id="totalNum">7</span></div>
+<button class="slide-btn" id="nextBtn" onclick="nextSlide()">Next <span class="arrow">→</span></button>
+</div>
+
+<script>
+/* State */
+let current=0;
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+const navLinks=document.querySelectorAll('.sidebar a');
+const titles=['Cover','Understanding','Two Sides','Side A — Internal','Side B — Product','Contribution','Pilots & Close'];
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+const curNum=document.getElementById('curNum');
+const mLabel=document.getElementById('mobileLabel');
+
+/* Build mobile progress dots */
+const track=document.getElementById('progressTrack');
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='progress-dot'+(i===0?' active':'');d.onclick=()=>goTo(i);track.appendChild(d)});
+
+/* Go to slide */
+function goTo(idx){
+if(idx<0||idx>=total||idx===current)return;
+slides.forEach((s,i)=>{
+s.classList.remove('active','prev');
+if(i===idx){s.classList.add('active');s.scrollTop=0;}
+else if(i<idx)s.classList.add('prev');
+});
+current=idx;
+updateUI();
+/* Stagger animate children */
+const inner=slides[idx].querySelector('.slide-inner');
+if(inner){
+const kids=[...inner.children];
+kids.forEach((c,i)=>{
+c.classList.add('stagger-child');
+c.style.animationDelay=(i*80)+'ms';
+});
+/* Clean up after animation */
+setTimeout(()=>{kids.forEach(c=>{c.classList.remove('stagger-child');c.style.opacity='1';c.style.animationDelay='';});},kids.length*80+600);
+}
+}
+function nextSlide(){goTo(current+1)}
+function prevSlide(){goTo(current-1)}
+
+function updateUI(){
+prevBtn.disabled=current===0;
+nextBtn.disabled=current===total-1;
+curNum.textContent=current+1;
+navLinks.forEach((a,i)=>{a.classList.toggle('active',i===current)});
+document.querySelectorAll('.progress-dot').forEach((d,i)=>d.classList.toggle('active',i<=current));
+if(mLabel)mLabel.textContent=titles[current]||'';
+}
+
+/* Keyboard nav */
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key==='ArrowDown')nextSlide();
+if(e.key==='ArrowLeft'||e.key==='ArrowUp')prevSlide();
+});
+
+/* Touch swipe */
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{
+const dx=e.changedTouches[0].clientX-tx;
+if(Math.abs(dx)>60){dx<0?nextSlide():prevSlide();}
+},{passive:true});
+
+/* Toggle expandable area cards */
+function toggleArea(header){
+const body=header.nextElementSibling;
+const icon=header.querySelector('.area-toggle');
+body.classList.toggle('open');
+icon.classList.toggle('open');
+}
+
+/* Init */
+updateUI();
+</script>
+</body>
+</html>
